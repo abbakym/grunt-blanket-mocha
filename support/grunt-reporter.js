@@ -66,7 +66,7 @@
             var thisFile = sortedFileNames[i];
             var data = cov[thisFile];
             var thisTotal= reportFile( data );
-            sendMessage("blanket:fileDone", thisTotal, thisFile);
+            sendMessage("blanket:fileDone", thisTotal, thisFile, data);
         }
 
         sendMessage("blanket:done");

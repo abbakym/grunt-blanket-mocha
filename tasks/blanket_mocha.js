@@ -86,17 +86,38 @@ module.exports = function(grunt) {
 
     };
 
+    function toLCOV(filename, data) {
+
+      var str="";
+      str += 'SF:' + filename + '\n';
+
+      grunt.verbose.writeln(('LCOVing blanket data for "' + filename + '": ' + data).green);
+
+      data.forEach(function(line, num) {
+        // increase the line number, as JS arrays are zero-based
+        num++;
+
+        if (data[num] != null) {
+          str += 'DA:' + num + ',' + data[num] + '\n';
+        }
+      });
+
+      str += 'end_of_record\n';
+      return str;
+    };
+
 
     // Manage runners listening to phantomjs
     var phantomjsEventManager = (function() {
         var listeners = {};
         var suites = [];
+        var lcov = '';
 
         phantomjs.on('blanket:done', function() {
             phantomjs.halt();
         });
 
-        phantomjs.on('blanket:fileDone', function(thisTotal, filename) {
+        phantomjs.on('blanket:fileDone', function(thisTotal, filename, rawData) {
 
             if (status.blanketPass === 0 && status.blanketFail === 0 ) {
                 grunt.log.writeln();
@@ -130,6 +151,8 @@ module.exports = function(grunt) {
                 totals.moduleTotalStatements[moduleName] += totalLines;
                 totals.moduleTotalCoveredStatements[moduleName] += coveredLines;
             }
+
+            lcov += toLCOV(filename, rawData);
         });
 
         // Hook on Phantomjs Mocha reporter events.
@@ -172,6 +195,9 @@ module.exports = function(grunt) {
             },
             remove: function(name) {
                 delete listeners[name];
+            },
+            getLCOV: function () {
+                return lcov;
             }
         };
     }());
@@ -301,6 +327,9 @@ module.exports = function(grunt) {
         // Latest mocha xunit reporter sends to process.stdout instead of console
         var processWrite = process.stdout.write;
 
+        var lcovDest = options.lcovDest;
+        var lcovOutput = [];
+
 
         // Only hijack if we really need to
         if (dest) {
@@ -400,6 +429,9 @@ module.exports = function(grunt) {
                         // Restore console.log to original and write the output
                         console.log = consoleLog;
                         grunt.file.write(dest, output.join('\n'));
+                    }
+                    if (lcovDest) {
+                        grunt.file.write(lcovDest, phantomjsEventManager.getLCOV());
                     }
                     grunt.log.writeln();
 
