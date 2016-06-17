@@ -2,6 +2,10 @@
 
 > Headless Blanket.js code coverage and Mocha testing via PhantomJS
 
+## Why fork?
+
+Because I needed to quick-fix a few options to let it integrate into CI more easily. Changes could breaking for others so I decided to keep a fork instead of pull-requesting.
+
 ## Wat?
 
 Other plugins look similar, but are different in that they:
