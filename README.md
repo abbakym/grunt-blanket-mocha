@@ -4,7 +4,7 @@
 
 ## Why fork?
 
-Because I needed to quick-fix a few options to let it integrate into CI more easily. Changes could breaking for others so I decided to keep a fork instead of pull-requesting.
+Because I needed to quick-fix a few options to let it integrate into CI more easily. Changes could be breaking for others so I decided to keep a fork instead of pull-requesting.
 
 ## Wat?
 
